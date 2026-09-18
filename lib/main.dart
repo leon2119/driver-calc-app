@@ -25,24 +25,56 @@ class CalculationScreen extends StatefulWidget {
 }
 
 class _CalculationScreenState extends State<CalculationScreen> {
-  // Expanded to 8 Rows with pre-set permanent rates from your image
+  // Configured back to your original 5 Top Rows and 3 Bottom Rows layout
   late final List<RowData> _topRows = [
     RowData(rate: 1033.0),
     RowData(rate: 350.0),
     RowData(rate: 1000.0),
     RowData(rate: 550.0),
-    RowData(rate: 0.0),
-    RowData(rate: 0.0),
-    RowData(rate: 0.0),
-    RowData(rate: 0.0),
+    RowData(), // 5th row
   ];
 
-  // Expanded to 5 Rows for Deductions
-  late final List<RowData> _bottomRows = List.generate(5, (_) => RowData());
+  late final List<RowData> _bottomRows = List.generate(3, (_) => RowData());
 
   double get _topTotal => _topRows.fold(0, (sum, row) => sum + row.result);
   double get _bottomTotal => _bottomRows.fold(0, (sum, row) => sum + row.result);
   double get _finalAmount => _topTotal - _bottomTotal;
+
+  // Clear function that leaves the first 4 default rates intact
+  void _clearInputs() {
+    setState(() {
+      // Clear top rows
+      for (int i = 0; i < _topRows.length; i++) {
+        _topRows[i].valueController.clear();
+        _topRows[i].value = 0.0;
+        
+        // Skip clearing the rate if it's one of the first 4 permanent fields
+        if (i >= 4) {
+          _topRows[i].rateController.clear();
+          _topRows[i].rate = 0.0;
+        }
+      }
+      
+      // Clear all bottom deduction rows completely
+      for (var row in _bottomRows) {
+        row.valueController.clear();
+        row.rateController.clear();
+        row.value = 0.0;
+        row.rate = 0.0;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    for (var row in _topRows) {
+      row.dispose();
+    }
+    for (var row in _bottomRows) {
+      row.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,23 +82,37 @@ class _CalculationScreenState extends State<CalculationScreen> {
       appBar: AppBar(
         title: const Text('Driver Allocation Calc'),
         backgroundColor: Colors.blueAccent,
+        // Added the Red Clear button actions array at the top right corner
+        actions: [
+          TextButton(
+            onPressed: _clearInputs,
+            child: const Text(
+              'CLEAR',
+              style: TextStyle(
+                color: Colors.redAccent, 
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildSectionHeader("Earnings / Main Allocation (8 Rows)", Colors.green),
-            ...List.generate(8, (index) => _buildCalculationRow(_topRows[index])),
+            _buildSectionHeader("Earnings / Main Allocation (5 Rows)", Colors.green),
+            ...List.generate(5, (index) => _buildCalculationRow(_topRows[index])),
             const SizedBox(height: 10),
-            _buildTotalBadge("Top 8 Rows Total: ", _topTotal, Colors.green),
+            _buildTotalBadge("Top 5 Rows Total:", _topTotal, Colors.green),
 
             const Divider(height: 40, thickness: 2, color: Colors.grey),
 
-            _buildSectionHeader("Deductions / Expenses (5 Rows)", Colors.red),
-            ...List.generate(5, (index) => _buildCalculationRow(_bottomRows[index])),
+            _buildSectionHeader("Deductions / Expenses (3 Rows)", Colors.red),
+            ...List.generate(3, (index) => _buildCalculationRow(_bottomRows[index])),
             const SizedBox(height: 10),
-            _buildTotalBadge("Bottom 5 Rows Total: ", _bottomTotal, Colors.red),
+            _buildTotalBadge("Bottom 3 Rows Total:", _bottomTotal, Colors.red),
 
             const SizedBox(height: 30),
 
@@ -130,7 +176,8 @@ class _CalculationScreenState extends State<CalculationScreen> {
       child: Row(
         children: [
           Expanded(
-            child: TextField(
+            child: TextFormField(
+              controller: row.valueController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Value',
@@ -147,7 +194,7 @@ class _CalculationScreenState extends State<CalculationScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: TextFormField(
-              initialValue: row.rate > 0 ? row.rate.toStringAsFixed(0) : '',
+              controller: row.rateController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(
                 labelText: 'Rate',
@@ -186,6 +233,18 @@ class _CalculationScreenState extends State<CalculationScreen> {
 class RowData {
   double value;
   double rate;
-  RowData({this.value = 0.0, this.rate = 0.0});
+  
+  final TextEditingController valueController;
+  final TextEditingController rateController;
+
+  RowData({this.value = 0.0, this.rate = 0.0})
+      : valueController = TextEditingController(text: value > 0 ? value.toString() : ''),
+        rateController = TextEditingController(text: rate > 0 ? rate.toStringAsFixed(0) : '');
+
   double get result => value * rate;
+
+  void dispose() {
+    valueController.dispose();
+    rateController.dispose();
+  }
 }
