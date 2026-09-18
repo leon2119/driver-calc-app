@@ -25,16 +25,20 @@ class CalculationScreen extends StatefulWidget {
 }
 
 class _CalculationScreenState extends State<CalculationScreen> {
-  // Configured back to your original 5 Top Rows and 3 Bottom Rows layout
+  // Expanded layout to 8 Rows with pre-set permanent rates from your profile
   late final List<RowData> _topRows = [
     RowData(rate: 1033.0),
     RowData(rate: 350.0),
     RowData(rate: 1000.0),
     RowData(rate: 550.0),
     RowData(), // 5th row
+    RowData(), // 6th row
+    RowData(), // 7th row
+    RowData(), // 8th row
   ];
 
-  late final List<RowData> _bottomRows = List.generate(3, (_) => RowData());
+  // Expanded layout to 5 Rows for Deductions
+  late final List<RowData> _bottomRows = List.generate(5, (_) => RowData());
 
   double get _topTotal => _topRows.fold(0, (sum, row) => sum + row.result);
   double get _bottomTotal => _bottomRows.fold(0, (sum, row) => sum + row.result);
@@ -43,19 +47,19 @@ class _CalculationScreenState extends State<CalculationScreen> {
   // Clear function that leaves the first 4 default rates intact
   void _clearInputs() {
     setState(() {
-      // Clear top rows
+      // Clear all 8 top rows
       for (int i = 0; i < _topRows.length; i++) {
         _topRows[i].valueController.clear();
         _topRows[i].value = 0.0;
         
-        // Skip clearing the rate if it's one of the first 4 permanent fields
+        // Only clear the rate field if it is NOT one of the first 4 permanent rates
         if (i >= 4) {
           _topRows[i].rateController.clear();
           _topRows[i].rate = 0.0;
         }
       }
       
-      // Clear all bottom deduction rows completely
+      // Clear all 5 bottom deduction rows completely
       for (var row in _bottomRows) {
         row.valueController.clear();
         row.rateController.clear();
@@ -82,7 +86,6 @@ class _CalculationScreenState extends State<CalculationScreen> {
       appBar: AppBar(
         title: const Text('Driver Allocation Calc'),
         backgroundColor: Colors.blueAccent,
-        // Added the Red Clear button actions array at the top right corner
         actions: [
           TextButton(
             onPressed: _clearInputs,
@@ -102,17 +105,17 @@ class _CalculationScreenState extends State<CalculationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildSectionHeader("Earnings / Main Allocation (5 Rows)", Colors.green),
-            ...List.generate(5, (index) => _buildCalculationRow(_topRows[index])),
+            _buildSectionHeader("Earnings / Main Allocation (8 Rows)", Colors.green),
+            ...List.generate(8, (index) => _buildCalculationRow(_topRows[index])),
             const SizedBox(height: 10),
-            _buildTotalBadge("Top 5 Rows Total:", _topTotal, Colors.green),
+            _buildTotalBadge("Top 8 Rows Total:", _topTotal, Colors.green),
 
             const Divider(height: 40, thickness: 2, color: Colors.grey),
 
-            _buildSectionHeader("Deductions / Expenses (3 Rows)", Colors.red),
-            ...List.generate(3, (index) => _buildCalculationRow(_bottomRows[index])),
+            _buildSectionHeader("Deductions / Expenses (5 Rows)", Colors.red),
+            ...List.generate(5, (index) => _buildCalculationRow(_bottomRows[index])),
             const SizedBox(height: 10),
-            _buildTotalBadge("Bottom 3 Rows Total:", _bottomTotal, Colors.red),
+            _buildTotalBadge("Bottom 5 Rows Total:", _bottomTotal, Colors.red),
 
             const SizedBox(height: 30),
 
