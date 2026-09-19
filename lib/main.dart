@@ -194,7 +194,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ["xlsx", "xls"], withData: true);
       if (result != null && result.files.first.bytes != null) {
         _fileName = result.files.first.name;
-        var excel = Excel.decodeBytes(result.files.first.bytes!);
+        var excel = img_excel.Excel.decodeBytes(result.files.first.bytes!);
         List<Map<String, String>> tempRows = [];
         for (var table in excel.tables.keys) {
           var sheet = excel.tables[table];
