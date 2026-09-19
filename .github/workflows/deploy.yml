@@ -25,4 +25,4 @@ jobs:
         run: flutter build web --release
 
       - name: Upload Finished Web App Assets to Production
-        run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }} --name=driver-calc-app --yes
+        run: npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
