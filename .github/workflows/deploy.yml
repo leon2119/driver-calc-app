@@ -1,11 +1,12 @@
-name: Flutter Web Cloud Compile
+﻿name: Compile and Deploy Flutter Web to Vercel
+
 on:
   push:
     branches:
       - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -14,26 +15,29 @@ jobs:
       - name: Setup Java Environment
         uses: actions/setup-java@v3
         with:
-          distribution: "zulu"
-          java-version: "17"
+          distribution: 'zulu'
+          java-version: '17'
 
-      - name: Setup Flutter Framework
+      - name: Install and Setup Flutter Framework
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.47.4"
-          channel: "stable"
+          channel: 'stable'
+          cache: true
 
       - name: Download Application Dependencies
         run: flutter pub get
 
-      - name: Compile Production Web Assets
+      - name: Compile Flutter Web Production Assets
         run: flutter build web --release
 
-      - name: Deploy Live Build Assets to Vercel
-        uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: "--prod"
-          working-directory: ./build/web
+      - name: Install Vercel Platform CLI
+        run: npm install -g vercel
+
+      - name: Pull Vercel Project Environment Data
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Upload Finished Web App Assets to Production
+        run: vercel deploy --prod --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
