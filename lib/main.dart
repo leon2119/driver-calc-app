@@ -1,6 +1,6 @@
-import "package:flutter/material.dart";
+﻿import "package:flutter/material.dart";
 import "package:file_picker/file_picker.dart";
-import "package:excel/excel.dart";
+import "package:excel/excel.dart" as img_excel;
 import "package:firebase_core/firebase_core.dart";
 import "package:firebase_database/firebase_database.dart";
 import "package:shared_preferences/shared_preferences.dart";
@@ -32,7 +32,7 @@ class IntegratedMusterSystemApp extends StatelessWidget {
     if (roleParam == "admin") {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: "ટ્રાન્સપોર્ટ મસ્ટર સિસ્ટમ (એડમિન)",
+        title: "àªŸà«àª°àª¾àª¨à«àª¸àªªà«‹àª°à«àªŸ àª®àª¸à«àªŸàª° àª¸àª¿àª¸à«àªŸàª® (àªàª¡àª®àª¿àª¨)",
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo), 
           useMaterial3: true
@@ -43,7 +43,7 @@ class IntegratedMusterSystemApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "ટ્રાન્સપોર્ટ મસ્ટર સિસ્ટમ",
+      title: "àªŸà«àª°àª¾àª¨à«àª¸àªªà«‹àª°à«àªŸ àª®àª¸à«àªŸàª° àª¸àª¿àª¸à«àªŸàª®",
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink), 
         useMaterial3: true
@@ -88,7 +88,7 @@ class _DriverGatewayScreenState extends State<DriverGatewayScreen> {
     if (inputId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("કૃપા કરીને આઈડી અથવા ગાડી નંબર લખો"), 
+          content: Text("àª•à«ƒàªªàª¾ àª•àª°à«€àª¨à«‡ àª†àªˆàª¡à«€ àª…àª¥àªµàª¾ àª—àª¾àª¡à«€ àª¨àª‚àª¬àª° àª²àª–à«‹"), 
           backgroundColor: Colors.red
         )
       );
@@ -125,7 +125,7 @@ class _DriverGatewayScreenState extends State<DriverGatewayScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: const Text("ટ્રાન્સપોર્ટ મસ્ટર કાર્ડ", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text("àªŸà«àª°àª¾àª¨à«àª¸àªªà«‹àª°à«àªŸ àª®àª¸à«àªŸàª° àª•àª¾àª°à«àª¡", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: Colors.pink.shade700,
         centerTitle: true,
       ),
@@ -143,15 +143,15 @@ class _DriverGatewayScreenState extends State<DriverGatewayScreen> {
                 children: [
                   const Icon(Icons.local_shipping, size: 64, color: Colors.pink),
                   const SizedBox(height: 16),
-                  const Text("લૉગિન / LOGIN", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const Text("àª²à«‰àª—àª¿àª¨ / LOGIN", textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  const Text("માહિતી જોવા માટે તમારો ડ્રાઈવર આઈડી અથવા ગાડી નંબર નાખો", textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: Colors.grey)),
+                  const Text("àª®àª¾àª¹àª¿àª¤à«€ àªœà«‹àªµàª¾ àª®àª¾àªŸà«‡ àª¤àª®àª¾àª°à«‹ àª¡à«àª°àª¾àªˆàªµàª° àª†àªˆàª¡à«€ àª…àª¥àªµàª¾ àª—àª¾àª¡à«€ àª¨àª‚àª¬àª° àª¨àª¾àª–à«‹", textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: Colors.grey)),
                   const SizedBox(height: 24),
                   TextField(
                     controller: _idController,
                     decoration: InputDecoration(
-                      labelText: "ડ્રાઈવર આઈડી / ગાડી નંબર",
-                      hintText: "દા.ત. GJ10TD003",
+                      labelText: "àª¡à«àª°àª¾àªˆàªµàª° àª†àªˆàª¡à«€ / àª—àª¾àª¡à«€ àª¨àª‚àª¬àª°",
+                      hintText: "àª¦àª¾.àª¤. GJ10TD003",
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       prefixIcon: const Icon(Icons.person),
                     ),
@@ -165,7 +165,7 @@ class _DriverGatewayScreenState extends State<DriverGatewayScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text("કાર્ડ જુઓ / VIEW CARD", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    child: const Text("àª•àª¾àª°à«àª¡ àªœà«àª“ / VIEW CARD", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -232,8 +232,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         String cleanId = rawId.toLowerCase().replaceAll(" ", "_");
         await _dbRef.child(cleanId).child("meta").set({
           "factory_no": row["factory_no"] ?? "GJ 10 TD 003",
-          "driver_name": row["driver_name_guj"] ?? "ડ્રાઈવર",
-          "month": row["month_year"] ?? "સપ્ટેમ્બર ૨૦૨૬",
+          "driver_name": row["driver_name_guj"] ?? "àª¡à«àª°àª¾àªˆàªµàª°",
+          "month": row["month_year"] ?? "àª¸àªªà«àªŸà«‡àª®à«àª¬àª° à«¨à«¦à«¨à«¬",
           "total_pay": row["total_pay"] ?? "0.00",
           "advance": row["total_advance"] ?? "0.00",
         });
@@ -242,7 +242,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           "advance_entry": row["day_advance"] ?? "",
         });
       }
-      _showSnackBar("ઇન્ટરનેટ પર ડેટા સિંક થઈ ગયો!", Colors.green);
+      _showSnackBar("àª‡àª¨à«àªŸàª°àª¨à«‡àªŸ àªªàª° àª¡à«‡àªŸàª¾ àª¸àª¿àª‚àª• àª¥àªˆ àª—àª¯à«‹!", Colors.green);
     } catch (e) {
       _showSnackBar("Sync Error: $e", Colors.red);
     } finally {
@@ -258,7 +258,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("ટ્રાન્સપોર્ટ માસ્ટર એડમિન પેનલ (Cloud Sync)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text("àªŸà«àª°àª¾àª¨à«àª¸àªªà«‹àª°à«àªŸ àª®àª¾àª¸à«àªŸàª° àªàª¡àª®àª¿àª¨ àªªà«‡àª¨àª² (Cloud Sync)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.indigo.shade900, centerTitle: true,
       ),
       body: Padding(
@@ -272,11 +272,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    const Text("હાજરી એક્સેલ ફાઈલ અપલોડ કરો", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text("àª¹àª¾àªœàª°à«€ àªàª•à«àª¸à«‡àª² àª«àª¾àªˆàª² àª…àªªàª²à«‹àª¡ àª•àª°à«‹", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 15),
                     ElevatedButton.icon(
                       onPressed: _isProcessing ? null : _pickAndParseDailyFile,
-                      icon: const Icon(Icons.file_upload), label: Text(_fileName ?? "એક્સેલ શીટ પસંદ કરો (.xlsx)"),
+                      icon: const Icon(Icons.file_upload), label: Text(_fileName ?? "àªàª•à«àª¸à«‡àª² àª¶à«€àªŸ àªªàª¸àª‚àª¦ àª•àª°à«‹ (.xlsx)"),
                     ),
                   ],
                 ),
@@ -287,20 +287,20 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ElevatedButton.icon(
                 onPressed: _isProcessing ? null : _syncDataToInternet,
                 icon: const Icon(Icons.bolt),
-                label: const Text("લાઇવ અપડેટ કરો / SYNC DATA TO DRIVERS", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                label: const Text("àª²àª¾àª‡àªµ àª…àªªàª¡à«‡àªŸ àª•àª°à«‹ / SYNC DATA TO DRIVERS", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.orange.shade800, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 16)),
               ),
             const SizedBox(height: 20),
             Expanded(
               child: _parsedDailyRows.isEmpty 
-                  ? const Center(child: Text("કોઈ ડેટા લોડ થયો નથી."))
+                  ? const Center(child: Text("àª•à«‹àªˆ àª¡à«‡àªŸàª¾ àª²à«‹àª¡ àª¥àª¯à«‹ àª¨àª¥à«€."))
                   : ListView.builder(
                       itemCount: _parsedDailyRows.length,
                       itemBuilder: (context, idx) {
                         final r = _parsedDailyRows[idx];
                         return ListTile(
-                          title: Text("ડ્રાઈવર: ${r["driver_name_guj"]} (ID: ${r["driver_id"]})"),
-                          subtitle: Text("તારીખ: ${r["date_day"]} | હાજરી: ${r["present_status"]} | એડવાન્સ: ₹${r["day_advance"]}"),
+                          title: Text("àª¡à«àª°àª¾àªˆàªµàª°: ${r["driver_name_guj"]} (ID: ${r["driver_id"]})"),
+                          subtitle: Text("àª¤àª¾àª°à«€àª–: ${r["date_day"]} | àª¹àª¾àªœàª°à«€: ${r["present_status"]} | àªàª¡àªµàª¾àª¨à«àª¸: â‚¹${r["day_advance"]}"),
                           trailing: const Icon(Icons.check_circle, color: Colors.green),
                         );
                       },
@@ -328,7 +328,7 @@ class DriverReadOnlyScreen extends StatelessWidget {
         if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
           return Scaffold(
             appBar: AppBar(backgroundColor: Colors.pink.shade700, actions: [IconButton(onPressed: onLogout, icon: const Icon(Icons.logout, color: Colors.white))]),
-            body: const Center(child: Text("કાર્ડ મળ્યું નથી.\nકૃપા કરીને આઈડી તપાસો અને ફરી લૉગિન કરો.", textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
+            body: const Center(child: Text("àª•àª¾àª°à«àª¡ àª®àª³à«àª¯à«àª‚ àª¨àª¥à«€.\nàª•à«ƒàªªàª¾ àª•àª°à«€àª¨à«‡ àª†àªˆàª¡à«€ àª¤àªªàª¾àª¸à«‹ àª…àª¨à«‡ àª«àª°à«€ àª²à«‰àª—àª¿àª¨ àª•àª°à«‹.", textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
           );
         }
         final Map<dynamic, dynamic> driverData = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
@@ -340,10 +340,10 @@ class DriverReadOnlyScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: Colors.grey.shade200,
           appBar: AppBar(
-            title: Text("${meta["driver_name"] ?? "મારું"} મસ્ટર કાર્ડ", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+            title: Text("${meta["driver_name"] ?? "àª®àª¾àª°à«àª‚"} àª®àª¸à«àªŸàª° àª•àª¾àª°à«àª¡", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
             backgroundColor: Colors.pink.shade700, 
             centerTitle: true,
-            actions: [IconButton(onPressed: onLogout, icon: const Icon(Icons.logout, color: Colors.white), tooltip: "બીજું આઈડી નાખો")],
+            actions: [IconButton(onPressed: onLogout, icon: const Icon(Icons.logout, color: Colors.white), tooltip: "àª¬à«€àªœà«àª‚ àª†àªˆàª¡à«€ àª¨àª¾àª–à«‹")],
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(12.0),
@@ -357,13 +357,13 @@ class DriverReadOnlyScreen extends StatelessWidget {
                     Center(
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4), color: Colors.black87,
-                        child: const Text("MUSTER CARD / મસ્ટર કાર્ડ (ફક્ત વાંચવા માટે)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                        child: const Text("MUSTER CARD / àª®àª¸à«àªŸàª° àª•àª¾àª°à«àª¡ (àª«àª•à«àª¤ àªµàª¾àª‚àªšàªµàª¾ àª®àª¾àªŸà«‡)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text("ગાડી નંબર: ${meta["factory_no"] ?? ""}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    Text("નામ: ${meta["driver_name"] ?? ""}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    Text("મહિનો: ${meta["month"] ?? ""}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    Text("àª—àª¾àª¡à«€ àª¨àª‚àª¬àª°: ${meta["factory_no"] ?? ""}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    Text("àª¨àª¾àª®: ${meta["driver_name"] ?? ""}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    Text("àª®àª¹àª¿àª¨à«‹: ${meta["month"] ?? ""}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     const SizedBox(height: 15),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -374,9 +374,9 @@ class DriverReadOnlyScreen extends StatelessWidget {
                       ],
                     ),
                     const Divider(height: 30, color: Colors.black),
-                    _buildFooterMetric("કુલ પગા૨ / TOTAL PAY", "₹ ${totalPay.toStringAsFixed(2)}"),
-                    _buildFooterMetric("એડવાન્સ / ADVANCE", "₹ ${advance.toStringAsFixed(2)}"),
-                    _buildFooterMetric("બાકી રકમ / BALANCE", "₹ ${balance.toStringAsFixed(2)}", isBold: true),
+                    _buildFooterMetric("àª•à«àª² àªªàª—àª¾à«¨ / TOTAL PAY", "â‚¹ ${totalPay.toStringAsFixed(2)}"),
+                    _buildFooterMetric("àªàª¡àªµàª¾àª¨à«àª¸ / ADVANCE", "â‚¹ ${advance.toStringAsFixed(2)}"),
+                    _buildFooterMetric("àª¬àª¾àª•à«€ àª°àª•àª® / BALANCE", "â‚¹ ${balance.toStringAsFixed(2)}", isBold: true),
                   ],
                 ),
               ),
@@ -394,9 +394,9 @@ class DriverReadOnlyScreen extends StatelessWidget {
         const TableRow(
           decoration: BoxDecoration(color: Colors.black12),
           children: [
-            TableCell(child: Center(child: Text("તારીખ", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)))),
-            TableCell(child: Center(child: Text("હાજરી", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)))),
-            TableCell(child: Center(child: Text("એડવાન્સ", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)))),
+            TableCell(child: Center(child: Text("àª¤àª¾àª°à«€àª–", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)))),
+            TableCell(child: Center(child: Text("àª¹àª¾àªœàª°à«€", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)))),
+            TableCell(child: Center(child: Text("àªàª¡àªµàª¾àª¨à«àª¸", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)))),
           ],
         ),
         ...List.generate((end - start) + 1, (idx) {
