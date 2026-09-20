@@ -3,7 +3,6 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:excel/excel.dart' as img_excel;
 
 void main() {
-  // Fix the blank screen error by using Hash routing strategy safely on Vercel
   usePathUrlStrategy();
   runApp(const DriverCalcApp());
 }
@@ -22,9 +21,12 @@ class DriverCalcApp extends StatelessWidget {
       ),
       initialRoute: '/',
       onGenerateRoute: (settings) {
-        // Handle the incoming administrative URL parameters cleanly
-        final Uri uri = Uri.parse(settings.name ?? '/');
-        if (uri.queryParameters['role'] == 'admin') {
+        // Correctly capture and inspect web settings names for the hash parameters block
+        final String routeName = settings.name ?? '/';
+        final Uri uri = Uri.parse(routeName);
+        
+        // This checks if either a standard sub-route or a hash query contains the admin role flag
+        if (uri.queryParameters['role'] == 'admin' || routeName.contains('role=admin')) {
           return MaterialPageRoute(builder: (_) => const AdminDashboard());
         }
         return MaterialPageRoute(builder: (_) => const DriverLoginPage());
@@ -49,7 +51,7 @@ class _DriverLoginPageState extends State<DriverLoginPage> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: const Text('ડ્રાઈવર લોગીન પોર્ટલ / DRIVER PORTAL', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-        backgroundColor: Colors.pink[700],
+        backgroundColor: Colors.pink,
         centerTitle: true,
       ),
       body: Center(
@@ -65,9 +67,9 @@ class _DriverLoginPageState extends State<DriverLoginPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.local_shipping, size: 80, color: Colors.pink[700]),
+              const Icon(Icons.local_shipping, size: 80, color: Colors.pink),
               const SizedBox(height: 20),
-              Text('લોગિન / LOGIN', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.pink[900])),
+              const Text('લોગિન / LOGIN', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.pink)),
               const SizedBox(height: 10),
               const Text('તમારો વ્હીકલ નંબર દાખલ કરો / Enter Vehicle ID', style: TextStyle(color: Colors.grey)),
               const SizedBox(height: 20),
@@ -85,7 +87,7 @@ class _DriverLoginPageState extends State<DriverLoginPage> {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pink[700],
+                    backgroundColor: Colors.pink,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   onPressed: () {},
@@ -106,9 +108,11 @@ class AdminDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blueGrey[50],
       appBar: AppBar(
         title: const Text('માસ્ટર એડમિન ડેશબોર્ડ / ADMIN PANEL', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blueGrey[800],
+        backgroundColor: Colors.blueGrey,
+        centerTitle: true,
       ),
       body: Center(
         child: Padding(
@@ -116,22 +120,20 @@ class AdminDashboard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.admin_panel_settings, size: 100, color: Colors.blueGrey[700]),
+              const Icon(Icons.admin_panel_settings, size: 100, color: Colors.blueGrey),
               const SizedBox(height: 20),
-              Text('એડમિનિસ્ટ્રેટર વર્કસ્પેસ', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.blueGrey[900])),
+              const Text('એડમિનિસ્ટ્રેટર વર્કસ્પેસ', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
               const SizedBox(height: 10),
               const Text('Upload Excel spreadsheets here to sync drivers database updates.', style: TextStyle(fontSize: 16, color: Colors.grey)),
               const SizedBox(height: 40),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueGrey[800],
+                  backgroundColor: Colors.blueGrey,
                   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 ),
                 icon: const Icon(Icons.upload_file, color: Colors.white),
                 label: const Text('માસ્ટર એક્સેલ ફાઇલ અપલોડ કરો', style: TextStyle(color: Colors.white, fontSize: 16)),
-                onPressed: () {
-                  // Operational endpoint call for img_excel parser goes here
-                },
+                onPressed: () {},
               ),
             ],
           ),
