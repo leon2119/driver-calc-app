@@ -1,4 +1,4 @@
-﻿name: Compile and Deploy Flutter Web to Vercel
+name: Compile and Deploy Flutter Web to Vercel
 
 on:
   push:
