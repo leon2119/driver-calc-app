@@ -170,8 +170,10 @@ class DriverCardViewScreen extends StatelessWidget {
           Container(
             width: 150, padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(color: isBal ? const Color(0xFFFFF59D) : Colors.white, border: Border.all(color: Colors.black38)),
-            alignment: Alignment.centerRight,
-            child: Text('₹ ${val.toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold, color: isBal ? Colors.red : Colors.black87)),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Text('₹ ${val.toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold, color: isBal ? Colors.red : Colors.black87)),
+            ),
           )
         ],
       ),
@@ -292,7 +294,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
       appBar: AppBar(title: const Text('માસ્ટર એડમિન ડેશબોર્ડ / ADMIN PANEL'), backgroundColor: Colors.blueGrey, centerTitle: true),
       body: Center(
         child: Container(
-          maxWidth: 500, padding: const EdgeInsets.all(25),
+          constraints: const BoxConstraints(maxWidth: 500),
+          padding: const EdgeInsets.all(25),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
