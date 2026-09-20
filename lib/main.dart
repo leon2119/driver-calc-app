@@ -78,9 +78,10 @@ class _DriverLoginPageState extends State<DriverLoginPage> {
                 ),
               ),
               const SizedBox(height: 15),
+              // This button triggers a clean page shift directly into your workspace screen layout layers!
               TextButton(
                 onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboard())),
-                child: const Text('Admin Panel Login', style: TextStyle(color: Colors.blueGrey)),
+                child: const Text('Admin Panel Login', style: TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.bold)),
               )
             ],
           ),
@@ -258,8 +259,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           if (dt.isNotEmpty) {
             try {
               List<String> p = dt.contains('-') ? dt.split('-') : dt.split('/');
-              day = int.parse(p[0]);
-              mTxt = '${_months[int.parse(p[1])] ?? 'સપ્ટેમ્બર'} ${_toGujDigits(p[2])}';
+              day = int.parse(p);
+              mTxt = '${_months[int.parse(p)] ?? 'સપ્ટેમ્બર'} ${_toGujDigits(p)}';
             } catch (_) {}
           }
           String trip = row.length > trIdx ? row[trIdx]?.value?.toString().trim() ?? '' : '';
