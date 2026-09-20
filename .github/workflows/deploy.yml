@@ -26,3 +26,4 @@ jobs:
 
       - name: Upload Finished Web App Assets to Production
         run: npx vercel deploy build/web --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+
