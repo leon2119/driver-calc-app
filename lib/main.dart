@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:excel/excel.dart' as img_excel;
 
 void main() {
@@ -21,11 +22,9 @@ class DriverCalcApp extends StatelessWidget {
       ),
       initialRoute: '/',
       onGenerateRoute: (settings) {
-        // Correctly capture and inspect web settings names for the hash parameters block
         final String routeName = settings.name ?? '/';
         final Uri uri = Uri.parse(routeName);
         
-        // This checks if either a standard sub-route or a hash query contains the admin role flag
         if (uri.queryParameters['role'] == 'admin' || routeName.contains('role=admin')) {
           return MaterialPageRoute(builder: (_) => const AdminDashboard());
         }
@@ -102,13 +101,64 @@ class _DriverLoginPageState extends State<DriverLoginPage> {
   }
 }
 
-class AdminDashboard extends StatelessWidget {
+class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
+
+  @override
+  State<AdminDashboard> createState() => _AdminDashboardState();
+}
+
+class _AdminDashboardState extends State<AdminDashboard> {
+  String _statusMessage = 'Upload Excel spreadsheets here to sync drivers database updates.';
+  bool _isUploading = false;
+
+  // Operational function to trigger local file browser window picker
+  Future<void> _pickAndProcessExcel() async {
+    setState(() {
+      _isUploading = true;
+      _statusMessage = 'Opening file selector...';
+    });
+
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['xlsx', 'xls'],
+      );
+
+      if (result != null && result.files.first.bytes != null) {
+        setState(() {
+          _statusMessage = 'Processing Excel sheet contents...';
+        });
+
+        // Use our isolated namespace img_excel package to parse bytes directly
+        var bytes = result.files.first.bytes!;
+        var excel = img_excel.Excel.decodeBytes(bytes);
+        
+        // Count sheets to confirm the library successfully parsed the file layout
+        int sheetCount = excel.tables.keys.length;
+
+        setState(() {
+          _statusMessage = 'Success! Loaded file with $sheetCount sheet(s). Syncing to Firebase...';
+          _isUploading = false;
+        });
+      } else {
+        setState(() {
+          _statusMessage = 'File selection canceled.';
+          _isUploading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _statusMessage = 'Error reading file: $e';
+        _isUploading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey[50],
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('માસ્ટર એડમિન ડેશબોર્ડ / ADMIN PANEL', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blueGrey,
@@ -124,17 +174,19 @@ class AdminDashboard extends StatelessWidget {
               const SizedBox(height: 20),
               const Text('એડમિનિસ્ટ્રેટર વર્કસ્પેસ', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
               const SizedBox(height: 10),
-              const Text('Upload Excel spreadsheets here to sync drivers database updates.', style: TextStyle(fontSize: 16, color: Colors.grey)),
+              Text(_statusMessage, style: const TextStyle(fontSize: 16, color: Colors.grey), textAlign: TextAlign.center),
               const SizedBox(height: 40),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueGrey,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                ),
-                icon: const Icon(Icons.upload_file, color: Colors.white),
-                label: const Text('માસ્ટર એક્સેલ ફાઇલ અપલોડ કરો', style: TextStyle(color: Colors.white, fontSize: 16)),
-                onPressed: () {},
-              ),
+              _isUploading
+                  ? const CircularProgressIndicator(color: Colors.blueGrey)
+                  : ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey,
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      ),
+                      icon: const Icon(Icons.upload_file, color: Colors.white),
+                      label: const Text('માસ્ટર એક્સેલ ફાઇલ અપલોડ કરો', style: TextStyle(color: Colors.white, fontSize: 16)),
+                      onPressed: _pickAndProcessExcel,
+                    ),
             ],
           ),
         ),
