@@ -78,7 +78,6 @@ class _DriverLoginPageState extends State<DriverLoginPage> {
                 ),
               ),
               const SizedBox(height: 15),
-              // This button triggers a clean page shift directly into your workspace screen layout layers!
               TextButton(
                 onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboard())),
                 child: const Text('Admin Panel Login', style: TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.bold)),
@@ -191,7 +190,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
   String _status = 'Upload Excel spreadsheets to sync drivers database.';
   bool _loading = false;
 
-  final Map<int, String> _months = {1: 'જાન્યુઆરી', 2: 'ફેબ્રુઆરી', 3: 'માર્ચ', 4: 'એપ્રિલ', 5: 'મે', 6: 'જૂન', 7: 'જુલાઈ', 8: 'ઓગસ્ટ', 9: 'સપ્ટેમ્બર', 10: 'ઓક્ટોબર', 11: 'નવેમ્બર', 12: 'ડિસેમ્બર'};
+  final Map<int, String> _months = {
+    1: 'જાન્યુઆરી', 2: 'ફેબ્રુઆરી', 3: 'માર્ચ', 4: 'એપ્રિલ', 
+    5: 'મે', 6: 'જૂન', 7: 'જુલાઈ', 8: 'ઓગસ્ટ', 
+    9: 'સપ્ટેમ્બર', 10: 'ઓક્ટોબર', 11: 'નવેમ્બર', 12: 'ડિસેમ્બર'
+  };
 
   String _toGujDigits(String input) {
     const eng = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -259,8 +262,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           if (dt.isNotEmpty) {
             try {
               List<String> p = dt.contains('-') ? dt.split('-') : dt.split('/');
-              day = int.parse(p);
-              mTxt = '${_months[int.parse(p)] ?? 'સપ્ટેમ્બર'} ${_toGujDigits(p)}';
+              day = int.parse(p[0]);
+              mTxt = '${_months[int.parse(p[1])] ?? 'સપ્ટેમ્બર'} ${_toGujDigits(p[2])}';
             } catch (_) {}
           }
           String trip = row.length > trIdx ? row[trIdx]?.value?.toString().trim() ?? '' : '';
