@@ -45,7 +45,21 @@ class _DriverLoginPageState extends State<DriverLoginPage> {
           totalPay: dailyData['totalPay'] ?? 0.0,
           advancePay: dailyData['advancePay'] ?? 0.0,
         )));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('આઈડી મળી ગયું છે, પણ વ્હીકલ ડેટા હાજર નથી: $linkedVehicle'),
+            backgroundColor: Colors.orange,
+          ),
+        );
       }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('ખોટો આઈડી / Invalid Driver ID: $enteredLoginId'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -229,8 +243,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
           if (id.isNotEmpty && veh.isNotEmpty) roster[id] = {'vehicleId': veh, 'driverName': name};
         }
         setState(() { _globalLoginIdToVehicleRoster = roster; _status = 'Loaded ${roster.length} Master Driver IDs.'; _loading = false; });
+      } else {
+        setState(() { _status = 'Master List file picker canceled.'; _loading = false; });
       }
-    } catch (e) { setState(() { _status = 'Error: $e'; _loading = false; }); }
+    } catch (e) { setState(() { _status = 'Error parsing master rows: $e'; _loading = false; }); }
   }
   Future<void> _processDaily() async {
     setState(() { _loading = true; _status = 'Opening Daily Report...'; });
@@ -261,9 +277,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
           int day = 1; String mTxt = 'સપ્ટેમ્બર ૨૦૨૬';
           if (dt.isNotEmpty) {
             try {
-              List<String> p = dt.contains('-') ? dt.split('-') : dt.split('/');
-              day = int.parse(p[0]);
-              mTxt = '${_months[int.parse(p[1])] ?? 'સપ્ટેમ્બર'} ${_toGujDigits(p[2])}';
+              String pureDate = dt.contains(' ') ? dt.split(' ')[0] : dt;
+              List<String> p = pureDate.contains('-') ? pureDate.split('-') : pureDate.split('/');
+              if (p.length == 3) {
+                if (p[0].length == 4) {
+                  day = int.parse(p[2]);
+                  mTxt = '${_months[int.parse(p[1])] ?? 'સપ્ટેમ્બર'} ${_toGujDigits(p[0])}';
+                } else {
+                  day = int.parse(p[0]);
+                  mTxt = '${_months[int.parse(p[1])] ?? 'સપ્ટેમ્બર'} ${_toGujDigits(p[2])}';
+                }
+              }
             } catch (_) {}
           }
           String trip = row.length > trIdx ? row[trIdx]?.value?.toString().trim() ?? '' : '';
@@ -287,8 +311,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
           rec['totalPay'] = (rec['totalPay'] as double) + amt;
         }
         setState(() { _globalDriverMasterData = cache; _status = 'Loaded operational logs for ${cache.length} vehicles.'; _loading = false; });
+      } else {
+        setState(() { _status = 'Daily report upload canceled.'; _loading = false; });
       }
-    } catch (e) { setState(() { _status = 'Error: $e'; _loading = false; }); }
+    } catch (e) { setState(() { _status = 'Error parsing daily data: $e'; _loading = false; }); }
   }
 
   @override
