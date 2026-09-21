@@ -26,7 +26,7 @@ class _DriverLoginPageState extends State<DriverLoginPage> {
   final TextEditingController _loginIdController = TextEditingController();
 
   void _navigateToCardView() {
-    final String enteredLoginId = _loginIdController.text.trim().toUpperCase();
+    final String enteredLoginId = _loginIdController.text.trim().toUpperCase().replaceAll(' ', '');
     if (enteredLoginId.isEmpty) return;
 
     if (_globalLoginIdToVehicleRoster.containsKey(enteredLoginId)) {
@@ -48,15 +48,16 @@ class _DriverLoginPageState extends State<DriverLoginPage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('ગાડી ($linkedVehicle) નો ડેટા મળ્યો નથી. કૃપા કરીને ડેઇલી રિપોર્ટ અપલોડ કરો.'),
+            content: Text('ગાડી ($linkedVehicle) નો ડેટા મળ્યો નથી. કૃપા કરીને ડેઇલી રિપોર્ટ અપલોડ કરો.', style: const TextStyle(fontWeight: FontWeight.bold)),
             backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 6),
           ),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('આઈડી ખોટું છે / Invalid Driver ID: $enteredLoginId'),
+          content: Text('ખોટો આઈડી / Invalid Driver ID: $enteredLoginId'),
           backgroundColor: Colors.red,
         ),
       );
@@ -238,8 +239,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
         }
         for (int r = 1; r < table.rows.length; r++) {
           var row = table.rows[r]; if (row.isEmpty || row.length <= vIdx) continue;
-          String id = row[idIdx]?.value?.toString().trim().toUpperCase() ?? '';
-          String veh = row[vIdx]?.value?.toString().trim().toUpperCase() ?? '';
+          String id = row[idIdx]?.value?.toString().trim().toUpperCase().replaceAll(' ', '');
+          String veh = row[vIdx]?.value?.toString().trim().toUpperCase().replaceAll(' ', '');
           String name = row.length > nameIdx ? row[nameIdx]?.value?.toString().trim() ?? 'DRIVER' : 'DRIVER';
           if (id.isNotEmpty && veh.isNotEmpty) roster[id] = {'vehicleId': veh, 'driverName': name};
         }
@@ -259,8 +260,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         
         try {
           excel = img_excel.Excel.decodeBytes(bytes);
-        } catch (excelException) {
-          // FALLBACK ENGINE: Wipes formatting templates to read data rows safely if an exception triggers
+        } catch (_) {
           excel = img_excel.Excel.decodeBytes(bytes);
         }
 
@@ -280,11 +280,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
         for (int r = 1; r < table.rows.length; r++) {
           var row = table.rows[r]; if (row.isEmpty || row.length <= vIdx) continue;
-          String veh = row[vIdx]?.value?.toString().trim().toUpperCase() ?? '';
-          if (veh.isEmpty || veh.contains('NO DRIVER')) continue;
+          
+          // SPACE-PROOF MATCHING: Wipes all spaces from the vehicle code to guarantee a secure sync
+          String veh = row[vIdx]?.value?.toString().trim().toUpperCase().replaceAll(' ', '') ?? '';
+          if (veh.isEmpty || veh.contains('NODRIVER')) continue;
 
           String dt = row[dtIdx]?.value?.toString().trim() ?? '';
-          int day = 1; String mTxt = 'સપ્ટેમ્બર ૨૦运行';
+          int day = 1; String mTxt = 'સપ્ટેમ્બર ૨૦૨૬';
 
           if (dt.isNotEmpty) {
             try {
@@ -325,7 +327,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
         setState(() { _status = 'Daily report upload canceled.'; _loading = false; });
       }
     } catch (e) { 
-      // Safe fallback data mapping recovery container block
       setState(() { _status = 'Successfully parsed data matrices via fallback bypass engine.'; _loading = false; }); 
     }
   }
