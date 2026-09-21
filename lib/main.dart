@@ -254,7 +254,23 @@ class _AdminDashboardState extends State<AdminDashboard> {
       FilePickerResult? res = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['xlsx', 'xls']);
       if (res != null) {
         var bytes = res.files.first.bytes!;
+        
+        // FOOLPROOF OVERRIDE: Clear custom cell decoration rules to prevent formatting exceptions
         var excel = img_excel.Excel.decodeBytes(bytes);
+        for (var key in excel.tables.keys) {
+          var t = excel.tables[key];
+          if (t != null) {
+            for (var row in t.rows) {
+              for (var cell in row) {
+                if (cell != null) {
+                  // Erase hidden styling pointers that break Excel parsers
+                  cell.cellStyle = null; 
+                }
+              }
+            }
+          }
+        }
+
         var table = excel.tables[excel.tables.keys.first]!;
         Map<String, Map<String, dynamic>> cache = {};
         int dtIdx = 0, vIdx = 1, trIdx = 2, amtIdx = 9, remIdx = 14, advIdx = -1;
@@ -268,6 +284,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           if (n.contains('REMARK')) remIdx = c;
           if (n.contains('ADVANCE')) advIdx = c;
         }
+
         for (int r = 1; r < table.rows.length; r++) {
           var row = table.rows[r]; if (row.isEmpty || row.length <= vIdx) continue;
           String veh = row[vIdx]?.value?.toString().trim().toUpperCase() ?? '';
@@ -275,21 +292,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
           String dt = row[dtIdx]?.value?.toString().trim() ?? '';
           int day = 1; String mTxt = 'સપ્ટેમ્બર ૨૦૨૬';
+
           if (dt.isNotEmpty) {
             try {
-              String pureDate = dt.contains(' ') ? dt.split(' ')[0] : dt;
-              List<String> p = pureDate.contains('-') ? pureDate.split('-') : pureDate.split('/');
+              String cleanDt = dt.split(' ').first;
+              List<String> p = cleanDt.contains('-') ? cleanDt.split('-') : cleanDt.split('/');
               if (p.length == 3) {
+                int mNum = 9;
+                String yNum = '2026';
                 if (p[0].length == 4) {
-                  day = int.parse(p[2]);
-                  mTxt = '${_months[int.parse(p[1])] ?? 'સપ્ટેમ્બર'} ${_toGujDigits(p[0])}';
+                  day = int.parse(p[2]); mNum = int.parse(p[1]); yNum = p[0];
                 } else {
-                  day = int.parse(p[0]);
-                  mTxt = '${_months[int.parse(p[1])] ?? 'સપ્ટેમ્બર'} ${_toGujDigits(p[2])}';
+                  day = int.parse(p[0]); mNum = int.parse(p[1]); yNum = p[2];
                 }
+                mTxt = '${_months[mNum] ?? 'સપ્ટેમ્બર'} ${_toGujDigits(yNum)}';
               }
             } catch (_) {}
           }
+
           String trip = row.length > trIdx ? row[trIdx]?.value?.toString().trim() ?? '' : '';
           String rem = row.length > remIdx ? row[remIdx]?.value?.toString().trim().toUpperCase() ?? '' : '';
           double amt = row.length > amtIdx ? double.tryParse(row[amtIdx]?.value?.toString() ?? '') ?? 0.0 : 0.0;
@@ -310,6 +330,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           if (adv > 0) { rec['advances'][day] = adv.toStringAsFixed(0); rec['advancePay'] = (rec['advancePay'] as double) + adv; }
           rec['totalPay'] = (rec['totalPay'] as double) + amt;
         }
+
         setState(() { _globalDriverMasterData = cache; _status = 'Loaded operational logs for ${cache.length} vehicles.'; _loading = false; });
       } else {
         setState(() { _status = 'Daily report upload canceled.'; _loading = false; });
