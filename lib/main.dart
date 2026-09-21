@@ -3,7 +3,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:excel/excel.dart' as img_excel;
 
-// Global memory persistence layout matrix layers linking structural inputs
+// Global relational memory maps
 Map<String, Map<String, dynamic>> _globalDriverMasterData = {}; 
 Map<String, Map<String, String>> _globalLoginIdToVehicleRoster = {}; 
 
@@ -233,16 +233,21 @@ class _AdminDashboardState extends State<AdminDashboard> {
         int idIdx = 0, vIdx = 1, nameIdx = 2;
 
         for (int c = 0; c < table.rows.first.length; c++) {
-          String n = table.rows.first[c]?.value?.toString().toUpperCase() ?? '';
+          var cellVal = table.rows.first[c]?.value;
+          String n = cellVal != null ? cellVal.toString().toUpperCase() : '';
           if (n.contains('LOGIN') || n.contains('ID')) idIdx = c;
           if (n.contains('VEHICLE') || n.contains('NUMBER')) vIdx = c;
           if (n.contains('NAME')) nameIdx = c;
         }
         for (int r = 1; r < table.rows.length; r++) {
           var row = table.rows[r]; if (row.isEmpty || row.length <= vIdx) continue;
-          String id = row[idIdx]?.value?.toString().trim().toUpperCase().replaceAll(' ', '');
-          String veh = row[vIdx]?.value?.toString().trim().toUpperCase().replaceAll(' ', '');
-          String name = row.length > nameIdx ? row[nameIdx]?.value?.toString().trim() ?? 'DRIVER' : 'DRIVER';
+          var idCell = row[idIdx]?.value;
+          var vehCell = row[vIdx]?.value;
+          var nameCell = row.length > nameIdx ? row[nameIdx]?.value : null;
+
+          String id = idCell != null ? idCell.toString().trim().toUpperCase().replaceAll(' ', '') : '';
+          String veh = vehCell != null ? vehCell.toString().trim().toUpperCase().replaceAll(' ', '') : '';
+          String name = nameCell != null ? nameCell.toString().trim() : 'DRIVER';
           if (id.isNotEmpty && veh.isNotEmpty) roster[id] = {'vehicleId': veh, 'driverName': name};
         }
         setState(() { _globalLoginIdToVehicleRoster = roster; _status = 'Loaded ${roster.length} Master Driver IDs.'; _loading = false; });
@@ -270,7 +275,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
         int dtIdx = 0, vIdx = 1, trIdx = 2, amtIdx = 9, remIdx = 14, advIdx = -1;
 
         for (int c = 0; c < table.rows.first.length; c++) {
-          String n = table.rows.first[c]?.value?.toString().toUpperCase() ?? '';
+          var cellVal = table.rows.first[c]?.value;
+          String n = cellVal != null ? cellVal.toString().toUpperCase() : '';
           if (n.contains('DATE')) dtIdx = c;
           if (n.contains('VEHICLE')) vIdx = c;
           if (n.contains('TRIP')) trIdx = c;
@@ -282,10 +288,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
         for (int r = 1; r < table.rows.length; r++) {
           var row = table.rows[r]; if (row.isEmpty || row.length <= vIdx) continue;
           
-          String veh = row[vIdx]?.value?.toString().trim().toUpperCase().replaceAll(' ', '') ?? '';
+          var vehCell = row[vIdx]?.value;
+          String veh = vehCell != null ? vehCell.toString().trim().toUpperCase().replaceAll(' ', '') : '';
           if (veh.isEmpty || veh.contains('NODRIVER')) continue;
 
-          String dt = row[dtIdx]?.value?.toString().trim() ?? '';
+          var dtCell = row[dtIdx]?.value;
+          String dt = dtCell != null ? dtCell.toString().trim() : '';
           int day = 1; String mTxt = 'સપ્ટેમ્બર ૨૦૨૬';
 
           if (dt.isNotEmpty) {
@@ -293,7 +301,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
               String cleanDt = dt.split(' ').first;
               List<String> p = cleanDt.contains('-') ? cleanDt.split('-') : cleanDt.split('/');
               if (p.length >= 2) {
-                // FIXED ARRAY TARGET MATRIX INDICES TO PREVENT COMPILE CRASHES
                 day = int.parse(p[0]);
                 int mNum = int.parse(p[1]);
                 String yNum = p.length > 2 ? p[2] : '2026';
@@ -302,10 +309,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
             } catch (_) {}
           }
 
-          String trip = row.length > trIdx ? row[trIdx]?.value?.toString().trim() ?? '' : '';
-          String rem = row.length > remIdx ? row[remIdx]?.value?.toString().trim().toUpperCase() ?? '' : '';
-          double amt = row.length > amtIdx ? double.tryParse(row[amtIdx]?.value?.toString() ?? '') ?? 0.0 : 0.0;
-          double adv = (advIdx != -1 && row.length > advIdx) ? double.tryParse(row[advIdx]?.value?.toString() ?? '') ?? 0.0 : 0.0;
+          var tripCell = row.length > trIdx ? row[trIdx]?.value : null;
+          var remCell = row.length > remIdx ? row[remIdx]?.value : null;
+          var amtCell = row.length > amtIdx ? row[amtIdx]?.value : null;
+          var advCell = (advIdx != -1 && row.length > advIdx) ? row[advIdx]?.value : null;
+
+          String trip = tripCell != null ? tripCell.toString().trim() : '';
+          String rem = remCell != null ? remCell.toString().trim().toUpperCase() : '';
+          double amt = amtCell != null ? double.tryParse(amtCell.toString()) ?? 0.0 : 0.0;
+          double adv = advCell != null ? double.tryParse(advCell.toString()) ?? 0.0 : 0.0;
 
           if (!cache.containsKey(veh)) {
             cache[veh] = {'driverName': 'DRIVER', 'monthText': mTxt, 'days': <int, String>{}, 'advances': <int, String>{}, 'totalPay': 0.0, 'advancePay': 0.0};
@@ -313,8 +325,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           var rec = cache[veh]!;
           String disp = '';
           if (rem == 'BREAKDOWN') disp = 'ભાથું';
-          else if (rem.contains('12 HRS')) disp = '૧૨ કલાક';
-          else if (rem.contains('24 HRS')) disp = '૨૪ કલાક';
+          else if (rem.contains('12_HRS_SHIFT') || rem.contains('12 HRS SHIFT')) disp = '૧૨ કલાક';
+          else if (rem.contains('24_HRS_SHIFT') || rem.contains('24 HRS SHIFT')) disp = '૨૪ કલાક';
           else if (rem == 'OFF' || rem.contains('HOLD')) disp = 'આરામ';
           else disp = trip;
 
@@ -328,7 +340,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         setState(() { _status = 'Daily report upload canceled.'; _loading = false; });
       }
     } catch (e) { 
-      setState(() { _status = 'Successfully parsed data matrices via fallback bypass engine.'; _loading = false; }); 
+      setState(() { _status = 'Error parsing data metrics: $e'; _loading = false; }); 
     }
   }
 
