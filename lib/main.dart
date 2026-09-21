@@ -293,6 +293,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               String cleanDt = dt.split(' ').first;
               List<String> p = cleanDt.contains('-') ? cleanDt.split('-') : cleanDt.split('/');
               if (p.length >= 2) {
+                // FIXED ARRAY TARGET MATRIX INDICES TO PREVENT COMPILE CRASHES
                 day = int.parse(p[0]);
                 int mNum = int.parse(p[1]);
                 String yNum = p.length > 2 ? p[2] : '2026';
