@@ -196,6 +196,7 @@ class DriverCardViewScreen extends StatelessWidget {
     );
   }
 }
+
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
   @override
@@ -281,7 +282,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
         for (int r = 1; r < table.rows.length; r++) {
           var row = table.rows[r]; if (row.isEmpty || row.length <= vIdx) continue;
           
-          // SPACE-PROOF MATCHING: Wipes all spaces from the vehicle code to guarantee a secure sync
           String veh = row[vIdx]?.value?.toString().trim().toUpperCase().replaceAll(' ', '') ?? '';
           if (veh.isEmpty || veh.contains('NODRIVER')) continue;
 
